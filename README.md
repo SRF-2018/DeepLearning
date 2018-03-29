@@ -9,4 +9,4 @@
 [Reinforce Learning](http://aikorea.org/awesome-rl/)  
 [Random Forest](https://github.com/kjw0612/awesome-random-forest)  
 ## 스터디 진행 상황 ##
- [1주차(2018.03.24)](https://github.com/SRFDeepLearningStudy/DeepLearning/wiki/1-Week)
+ [1주차(2018.03.24)](https://github.com/SRF-2018/DeepLearning/wiki/1-Week)
