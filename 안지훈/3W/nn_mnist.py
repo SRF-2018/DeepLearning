@@ -43,32 +43,43 @@ for path in test_paths:
     test_y[i] = i // 10
     i += 1
 
+neural_num = 512
 nb_classes = 5
+keep_prob = tf.placeholder(tf.float32)
 x = tf.placeholder(tf.float32, [None, 784])
 y = tf.placeholder(tf.int32, [None, 1])
 y_one_hot = tf.one_hot(y,nb_classes,dtype=tf.float32)
 y_one_hot = tf.reshape(y_one_hot, [-1,nb_classes])
 
-W = tf.Variable(tf.random_normal([784, nb_classes]), name = 'weight')
-b = tf.Variable(tf.random_normal([nb_classes]), name = 'bias')
+W1 = tf.get_variable("W1", shape = [784, neural_num],initializer=tf.contrib.layers.xavier_initializer())
+b1 = tf.Variable(tf.random_normal([neural_num]))
+layer1 = tf.nn.relu(tf.matmul(x,W1) + b1)
+layer1 = tf.nn.dropout(layer1, keep_prob=keep_prob)
 
-logit = tf.matmul(x, W) + b
-hypothesis = tf.nn.softmax(logit)
-cost_i = tf.nn.softmax_cross_entropy_with_logits(logits=logit, labels=y_one_hot)
+W2 = tf.get_variable("W2", shape = [neural_num, neural_num],initializer=tf.contrib.layers.xavier_initializer())
+b2 = tf.Variable(tf.random_normal([neural_num]))
+layer2 = tf.nn.relu(tf.matmul(layer1,W2) + b2)
+layer2 = tf.nn.dropout(layer2, keep_prob=keep_prob)
+
+W3 = tf.get_variable("W3", shape = [neural_num, nb_classes],initializer=tf.contrib.layers.xavier_initializer())
+b3 = tf.Variable(tf.random_normal([nb_classes]))
+hypothesis = tf.matmul(layer2,W3) + b3
+
+cost_i = tf.nn.softmax_cross_entropy_with_logits_v2(logits=hypothesis, labels=y_one_hot)
 cost = tf.reduce_mean(cost_i)
-optimizer= tf.train.GradientDescentOptimizer(learning_rate=0.1).minimize(cost)
+optimizer= tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost)
 
 predict = tf.argmax(hypothesis, 1)
 curr_predict = tf.equal(predict, tf.argmax(y_one_hot, 1))
 accuray = tf.reduce_mean(tf.cast(curr_predict, tf.float32))
 
-file = open("mnist_result.txt","w")
+file = open("nn_mnist_result.txt","w")
 with tf.Session() as sess:
     sess.run(tf.global_variables_initializer())
-    for i in range(50000):
-        sess.run(optimizer,feed_dict = {x : my_X, y : my_Y})
+    for i in range(20000):
+        sess.run(optimizer,feed_dict = {x : my_X, y : my_Y, keep_prob:0.7})
 
-    pred = sess.run(predict, feed_dict = {x : test_x})
+    pred = sess.run(predict, feed_dict = {x : test_x, keep_prob:1.0})
     tr = 0          #true predict
     fl = 0          #false predict
     for p, y in zip(pred, test_y.flatten()):
