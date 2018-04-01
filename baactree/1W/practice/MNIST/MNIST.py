@@ -19,10 +19,13 @@ Y=tf.placeholder("float",[None,nb_classes])
 W=tf.Variable(tf.random_normal([784,nb_classes]))
 b=tf.Variable(tf.random_normal([nb_classes]))
 
-hypothesis=tf.nn.softmax(tf.matmul(X,W)+b)
+r=1e-4
 
-cost=tf.reduce_mean(-tf.reduce_sum(Y*tf.log(hypothesis),axis=1))
-optimizer=tf.train.GradientDescentOptimizer(learning_rate=1e-2).minimize(cost)
+hypothesis=tf.nn.softmax(tf.matmul(X,W)+b)
+cost=tf.reduce_mean(-tf.reduce_sum(Y*tf.log(hypothesis),axis=1))+r*tf.reduce_sum(tf.square(W))
+#hypothesis=tf.matmul(X,W)+b
+#cost=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=hypothesis,labels=Y))
+optimizer=tf.train.AdamOptimizer(learning_rate=1e-3).minimize(cost)
 
 is_correct=tf.equal(tf.argmax(hypothesis,1),tf.argmax(Y,1))
 accuracy=tf.reduce_mean(tf.cast(is_correct,"float"))
@@ -48,8 +51,4 @@ with tf.Session() as sess:
             c,_=sess.run([cost,optimizer],feed_dict={X:batch_xs,Y:batch_ys})
             avg_cost+=c/total_batch
         print("Epoch :","%04d"%(epoch+1),"cost =","{:.9f}".format(avg_cost))
-    r=random.randint(0,mnist.test.num_examples-1)
-    print("Label: ",sess.run(tf.argmax(mnist.test.labels[r:r+1],1)))
-    print("Prediction: ",sess.run(tf.argmax(hypothesis,1),feed_dict={X:mnist.test.images[r:r+1]}))
-    plt.imshow(mnist.test.images[r:r+1].reshape(28,28),cmap='Greys',interpolation='nearest')
-    plt.show()
+    print("Accuracy: ",sess.run(accuracy,feed_dict={X:mnist.test.images,Y:mnist.test.labels}))

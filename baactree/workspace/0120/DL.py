@@ -27,23 +27,30 @@ def make_data(num):
 
 save_file="saved/model.ckpt"
 
-
+learning_rate=0.001
+print(learning_rate)
 X=tf.placeholder("float",[None,128])
 Y=tf.placeholder("float",[None,10])
+keep_prob=tf.placeholder("float")
 
-W1=tf.Variable(tf.random_normal([128,5]))
-b1=tf.Variable(tf.random_normal([1,5]))
+W1=tf.get_variable("W1",shape=[128,256],initializer=tf.contrib.layers.xavier_initializer())
+b1=tf.Variable(tf.random_normal([256]))
+L1=tf.nn.relu(tf.matmul(X,W1)+b1)
+L1=tf.nn.dropout(L1,keep_prob=keep_prob)
 
-layer1=tf.nn.softmax(tf.matmul(X,W1)+b1)
+#W2=tf.Variable(tf.random_normal([256,256]))
+W2=tf.get_variable("W2",shape=[256,256],initializer=tf.contrib.layers.xavier_initializer())
+b2=tf.Variable(tf.random_normal([256]))
+L2=tf.nn.relu(tf.matmul(L1,W2)+b2)
+L2=tf.nn.dropout(L2,keep_prob=keep_prob)
 
-W2=tf.Variable(tf.random_normal([5,10]))
-b2=tf.Variable(tf.random_normal([1,10]))
+#W3=tf.Variable(tf.random_normal([256,10]))
+W3=tf.get_variable("W3",shape=[256,10],initializer=tf.contrib.layers.xavier_initializer())
+b3=tf.Variable(tf.random_normal([10]))
+H=tf.matmul(L2,W3)+b3;
 
-H=tf.nn.softmax(tf.matmul(layer1,W2)+b2)
-
-r=1e-5
-cost=tf.reduce_mean(-tf.reduce_sum(Y*tf.log(H),1))#+r(tf.reduce_sum(tf.square(W1))+tf.reduce_sum(tf.square(W2)))
-opt=tf.train.GradientDescentOptimizer(0.1).minimize(cost)
+cost=tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(logits=H,labels=Y))
+opt=tf.train.AdamOptimizer(learning_rate).minimize(cost)
 
 saver=tf.train.Saver()
 
@@ -53,13 +60,13 @@ with tf.Session() as sess:
     for batch in range(10000):
         x_data,y_data=make_data(2000)
         for step in range(10000):
-            ncost,nh,_=sess.run([cost,H,opt],feed_dict={X:x_data,Y:y_data})
+            ncost,nh,_=sess.run([cost,H,opt],feed_dict={X:x_data,Y:y_data,keep_prob:0.7})
             if step%1000==0:
                 print("step : ",step,"cost : ",sess.run(tf.reduce_mean(ncost)))
         ac=0
         x_test,y_test=make_data(100)
         for i in range(100):
-            ncost,nh,_=sess.run([cost,H,opt],feed_dict={X:x_test[i:i+1],Y:y_test[i:i+1]})
+            ncost,nh,_=sess.run([cost,H,opt],feed_dict={X:x_test[i:i+1],Y:y_test[i:i+1],keep_prob:1})
             ans=np.argmax(y_test[i:i+1])
             pred=np.argmax(nh)
             if ans==pred:
