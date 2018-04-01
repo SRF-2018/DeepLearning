@@ -10,3 +10,4 @@
 [Random Forest](https://github.com/kjw0612/awesome-random-forest)  
 ## 스터디 진행 상황 ##
  [1주차(2018.03.24)](https://github.com/SRF-2018/DeepLearning/wiki/1-Week)
+ [2주차(2018.04.01)](https://github.com/SRF-2018/DeepLearning/wiki/2-Week)
