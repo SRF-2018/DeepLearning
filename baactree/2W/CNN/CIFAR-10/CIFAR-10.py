@@ -14,7 +14,7 @@ fout=open("output.txt","w")
 learning_rate=0.001
 training_epochs=2000
 batch_size=100
-fout.write("learning_rate : %d\n"%learning_rate)
+fout.write("learning_rate : %lf\n"%learning_rate)
 fout.write("training_epochs : %d\n"%training_epochs)
 fout.write("batch_size : %d\n"%batch_size)
 ####

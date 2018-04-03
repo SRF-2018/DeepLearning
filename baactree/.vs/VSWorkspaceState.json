@@ -1,9 +1,16 @@
 {
   "ExpandedNodes": [
     "",
-    "\\2W\\NN",
-    "\\2W\\NN\\logs",
-    "\\2W\\NN\\MNIST"
+    "\\1W",
+    "\\1W\\practice",
+    "\\1W\\practice\\MNIST",
+    "\\2W",
+    "\\2W\\CNN",
+    "\\2W\\CNN\\CIFAR-10",
+    "\\2W\\NN\\MNIST",
+    "\\workspace",
+    "\\workspace\\0120"
   ],
+  "SelectedNode": "\\2W\\CNN\\CIFAR-10",
   "PreviewInSolutionExplorer": false
 }
